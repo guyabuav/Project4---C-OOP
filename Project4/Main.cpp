@@ -5,61 +5,59 @@
 #include "AD_File.h"
 using namespace std;
 
-// MISSINGS -
-// add try&catch for copy constructor of Folder
-
-//Working - 
-//AD_File - constructors, set&get functions, throw in setfilename, operator== (ALL WORKING)
-//DataFile - constructor, operator ==, getsize, setfilename(throw) (ALL WORKING)
-//Folder - constructors, getfilepath, addforarray, mkdir, mkfile, dir //copy con is not working+ cD(?)
-
 int main() {
-	bool flag = false;
-	while (!flag) {
-		try {
-			Folder foldertest = Folder(" ", " ");
-			string str1, str2, str3, str4, str5, str6, str7, str8, str9, str10, str11, str12;
-			cout << "Please enter folder names 1-4" << endl;
-			cin >> str1 >> str2 >> str3 >> str4 >> str5;
-			cout << "Please enter DataFile names and data 5-8 , 9-12" << endl;
-			cin >> str5 >> str6 >> str7 >> str8 >> str9 >> str10 >> str11 >> str12;
-			foldertest.folder.mkDir(str1);
-			foldertest.folder.mkDir(str2);
-			foldertest.folder.mkDir(str3);
-			foldertest.folder.mkDir(str4);
-			foldertest.folder.mkDir(str5);
-			foldertest.folder.mkfile(str5, str6);
-			foldertest.folder.mkfile(str7, str8);
-			foldertest.folder.mkfile(str9, str10);
-			foldertest.folder.mkfile(str11, str12);
-			flag = true;
-			foldertest.dir();
+	Folder* root = &Folder::root;
+	Folder* curr = root;
+	bool quit = false; string path;
+	string command, p_command;
+	char echoStream[256];
+	do {
+		std::cout << curr->getFullPath() << ">";
+		cin.ignore(cin.rdbuf()->in_avail());
+		cin >> command;
+		if (command == "cd") {
+			try {
+				cin.ignore(1);
+				cin >> p_command;
+				if (p_command == root->getFileName())
+					curr = root;
+				else curr = Folder::cd(p_command);
+			}
+			catch (string emsg) {
+				cout << emsg << endl;
+				quit = true;
+			};
+			continue;
 		}
-		catch (string emsg) {
-			cout << "Error happened" << endl << emsg << endl;
+		if (command == "mkdir") {
+			try {
+				cin.ignore(1);
+				cin >> p_command;
+				curr->mkDir(p_command);
+			}
+			catch (string msg) {
+				cout << msg << endl;
+				cout << "Please try add folder again with correct name" << endl;
+			}
+			continue;
 		}
-		if (!flag) {
-			cout << "Please try to add different file" << endl;
+		if (command == "dir") {
+			curr->dir();
+			continue;
 		}
-	}
-
+		if (command == "echo") {
+			cin.ignore(1);
+			std::cin.getline(echoStream, 256);
+			command = echoStream;
+			try {
+				curr->mkfile(command.substr(0, command.find('<') - 1), command.substr(command.find('<') + 2));
+			}
+			catch (string msg) {
+				cout << msg << endl;
+				cout << "Please enter new file name!" << endl;
+			};
+			continue;
+		}
+	} while (!quit);
+	cout << "The end!" << endl;
 }
-
-	/*bool flag = false;
-	while (!flag) {
-		try
-		{
-			test5.setFileName(stro);
-			flag = true;
-			cout << test5.getFileName() << endl;
-		}
-		catch (string emsg)
-		{
-			cout << "Error happened" << endl << emsg << endl;
-		}
-		if (!flag) {
-			cout << "Please ReEnter your data" << endl;
-		}
-
-	}*/
-

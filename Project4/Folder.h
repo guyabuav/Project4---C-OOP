@@ -1,5 +1,6 @@
 #pragma once
 #include "DataFile.h"
+#include <vector>
 
 class Folder : public AD_File
 {
@@ -9,7 +10,7 @@ public:
 	DataFile** DF;
 	Folder** Fold;
 	string path;
-	static Folder folder;
+	static Folder root;
 	int NumofDf;
 	int NumOfFold;
 	Folder(string FileName, string path);
@@ -23,7 +24,7 @@ public:
 	void mkfile(string NameOfFile, string FileData);
 	void mkDir(string FolderName);
 	void dir();
-	Folder cd(string path);
-	string recursive(string path);
+	static Folder* cd(string path);
+	static vector<string> split(string str, char delimiter);
 
 };

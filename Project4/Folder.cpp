@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "Folder.h"
 
-Folder Folder::folder = Folder("MainFolder", "root");
+Folder Folder::root = Folder("root","C:");
 
 Folder::Folder(string FileName, string path):AD_File(FileName), path(path), DF(NULL), Fold(NULL) {
 	this->NumOfFold = 0;
@@ -107,16 +107,19 @@ void Folder::mkfile(string NameOfFile, string FileData) {
 }
 
 void Folder::mkDir(string FolderName) {
-	Folder* Tempfold = new Folder(FolderName, this->path);
+	string temp = this->path;
+	temp.operator+=("/");
+	temp.append(this->getFileName());
+	Folder* Tempfold = new Folder(FolderName, temp);
 	this->addFileToArray(*Tempfold);
 }
 
 void Folder::dir() {
-	for (int i = 0; i < this->folder.NumofDf; i++) {
-		cout << this->folder.DF[i]->getTime() << " " << this->folder.DF[i]->getSize()<< " " << "KB" << " " << this->folder.DF[i]->getFileName() << endl;
+	for (int i = 0; i < this->root.NumofDf; i++) {
+		cout << this->root.DF[i]->getTime() << "       " << this->root.DF[i]->getSize()<< " " << "KB" << " " << this->root.DF[i]->getFileName() << ".txt" << endl;
 	}
-	for (int j = 0; j < this->folder.NumOfFold; j++) {
-		cout << this->folder.Fold[j]->getTime() << " " << "<DIR>" << " " << this->folder.Fold[j]->getFullPath() << endl;
+	for (int j = 0; j < this->root.NumOfFold; j++) {
+		cout << this->root.Fold[j]->getTime() << " " << "<DIR>" << " " << this->root.Fold[j]->getFullPath() << endl;
 	}
 }
 	
@@ -152,12 +155,46 @@ const Folder& Folder::operator=(const Folder& newfolder)
 	}
 }
 
-Folder Folder::cd(string path) {
-	string s = (path.substr(path.find_last_of("/\\") + 1));
-	for (int i = 0; i < this->folder.NumOfFold; i++) {
-		if (this->folder.Fold[i]->getFileName() == s) return *this->folder.Fold[i];
+vector<string> Folder::split(string str, char delimiter)
+{
+	vector<string> components;
+	string currentComponent;
+	for (char c : str) {
+		if (c == delimiter) {
+			components.push_back(currentComponent);
+			currentComponent = "";
+		}
+		else {
+			currentComponent += c;
+		}
 	}
-
+	components.push_back(currentComponent);
+	return components;
+}
+Folder* Folder::cd(string path)
+{
+	// Split the path into its components
+	vector<string> components = split(path, '\\');
+	// Start traversing the file system from the root folder
+	Folder* current = &root;
+	for (const string& component : components) {
+		// Search for a subfolder with a matching name
+		bool found = false;
+		for (int i = 0; i < current->NumOfFold; i++) {
+			if (current->Fold[i]->getFileName() == component) {
+				// Set the subfolder as the current folder and continue to the next component
+				current = current->Fold[i];
+				found = true;
+				break;
+			}
+		}
+		// If a subfolder is not found, return nullptr
+		if (!found) {
+			return nullptr;
+		}
+	}
+	// Return a pointer to the current folder
+	return current;
 }
 
 
