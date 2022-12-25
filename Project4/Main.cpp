@@ -6,6 +6,12 @@
 using namespace std;
 
 int main() {
+	//_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE); // FOR MEMO LEAKS //
+	//_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
+	//_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
+	//_CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDOUT);
+	//_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+	//_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDOUT);
 	Folder* root = &Folder::root;
 	Folder* curr = root;
 	bool quit = false; string path;
@@ -25,7 +31,6 @@ int main() {
 			}
 			catch (string emsg) {
 				cout << emsg << endl;
-				quit = true;
 			};
 			continue;
 		}
@@ -57,6 +62,12 @@ int main() {
 				cout << "Please enter new file name!" << endl;
 			};
 			continue;
+		}
+		if (command == "quit") {
+			//_CrtDumpMemoryLeaks(); // FOR MEMORY LEAKS //
+
+			cout << "Program ended" << endl;
+			exit(0);
 		}
 	} while (!quit);
 	cout << "The end!" << endl;

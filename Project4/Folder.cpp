@@ -104,6 +104,7 @@ Folder::Folder(const Folder& fold, string path) :path(path) {
 void Folder::mkfile(string NameOfFile, string FileData) {
 	DataFile* Tempfile = new DataFile(NameOfFile, FileData);
 	this->addFileToArray(*Tempfile);
+	delete Tempfile;
 }
 
 void Folder::mkDir(string FolderName) {
@@ -112,14 +113,15 @@ void Folder::mkDir(string FolderName) {
 	temp.append(this->getFileName());
 	Folder* Tempfold = new Folder(FolderName, temp);
 	this->addFileToArray(*Tempfold);
+	delete Tempfold;
 }
 
 void Folder::dir() {
-	for (int i = 0; i < this->root.NumofDf; i++) {
-		cout << this->root.DF[i]->getTime() << "       " << this->root.DF[i]->getSize()<< " " << "KB" << " " << this->root.DF[i]->getFileName() << ".txt" << endl;
+	for (int i = 0; i < this->NumofDf; i++) {
+		cout << this->DF[i]->getTime() << "       " << this->DF[i]->getSize()<< " " << "KB" << " " << this->DF[i]->getFileName() << ".txt" << endl;
 	}
-	for (int j = 0; j < this->root.NumOfFold; j++) {
-		cout << this->root.Fold[j]->getTime() << " " << "<DIR>" << " " << this->root.Fold[j]->getFullPath() << endl;
+	for (int j = 0; j < this->NumOfFold; j++) {
+		cout << this->Fold[j]->getTime() << " " << "<DIR>" << " " << this->Fold[j]->getFullPath() << endl;
 	}
 }
 	
@@ -171,30 +173,42 @@ vector<string> Folder::split(string str, char delimiter)
 	components.push_back(currentComponent);
 	return components;
 }
-Folder* Folder::cd(string path)
+Folder* Folder::cd(string path)throw (string)
 {
-	// Split the path into its components
+	
 	vector<string> components = split(path, '\\');
-	// Start traversing the file system from the root folder
 	Folder* current = &root;
+	for (int i = 0; i < root.NumofDf; i++) {
+		if (root.DF[i]->getFileName() == path) {
+			cout << "you are trying to get path of datafile. please enter folder name" << endl;
+			return &root;
+		}
+	}
 	for (const string& component : components) {
-		// Search for a subfolder with a matching name
-		bool found = false;
+		bool checker = false;
 		for (int i = 0; i < current->NumOfFold; i++) {
 			if (current->Fold[i]->getFileName() == component) {
-				// Set the subfolder as the current folder and continue to the next component
 				current = current->Fold[i];
-				found = true;
+				checker = true;
 				break;
 			}
 		}
-		// If a subfolder is not found, return nullptr
-		if (!found) {
-			return nullptr;
+		if (!checker) {
+			string s = "No folder found. please try again";
+				throw s;
 		}
 	}
-	// Return a pointer to the current folder
 	return current;
 }
 
+Folder::~Folder() {
+	for (int i = 0; i < this->NumofDf; i++) {
+		delete this->DF[i];
+	}
+	delete[] this->DF;
+	for (int j = 0; j < this->NumOfFold; j++) {
+		delete this->Fold[j];
+	}
+	delete[] this->Fold;
+}
 
